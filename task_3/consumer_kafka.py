@@ -10,31 +10,33 @@ if len(argv) != 2:
     print("enter number of consumers")
     sys.exit(1)
 
-x = argv[1]
+x = int(argv[1])
 
 # Consumer configuration
 conf = {'bootstrap.servers': ['10.156.0.3:6667', '10.156.0.4:6667', '10.156.0.5:6667'], 'group.id': 'sschokorov'}
 
 # Create Consumer instance
-# Hint: try debug='fetch' to generate some log messages
-c = Consumer(conf)
+xs = [2*i for i in range(x)]
+cs = [Consumer(conf) for i in range(x)]
+
+fs = [open("consumer_data/consumer_" + str(i) + ".txt", "w") for i in range(x)]
 
 # Subscribe to topics
-c.subscribe(topics = ["mles.announcements"])
+for i in range(x):
+    cs[i].subscribe(topics = ["mles.announcements"])
 
 # Read messages from Kafka, print to stdout
 try:
     while True:
-        msg = c.poll()
-        if msg is None:
-            continue
-        if msg.error():
-            raise KafkaException(msg.error())
-        else:
-            # Proper message
-            fs = [open("consumer_data/consumer_" + str(i) + ".txt", "w") for i in range(x)]
-            for f in fs:
-                f.write("topic = " + str(msg.topic()) + "; partition = " + str(msg.partition()) + "; offset = " + str(msg.offset()) + "; key = " + str(msg.key()) + "value = " + str(msg.value()))
+        for i in range(x):
+            msg = cs[i].poll()
+            if msg is None:
+                continue
+            if msg.error():
+                raise KafkaException(msg.error())
+            else:
+                # Proper message
+                fs[i].write("topic = " + str(msg.topic()) + "; partition = " + str(msg.partition()) + "; offset = " + str(msg.offset()) + "; key = " + str(msg.key()) + "value = " + str(msg.value()))
                 print("ok")
                 
 except Exception as ex:
