@@ -20,18 +20,17 @@
 # Reads lines from stdin and sends to Kafka.
 #
 
-from confluent_kafka import Producer
 from random import randint
 import sys
 import json
 import datetime
 
-topic = 'sschokorov'
+from confluent_kafka import Producer
+
+TOPIC = 'sschokorov'
 
 # Producer configuration
-conf = {'bootstrap.servers': '10.156.0.3:6667',
-		'bootstrap.servers': '10.156.0.4:6667',
-		'bootstrap.servers': '10.156.0.5:6667'}
+conf = {'bootstrap.servers': '10.156.0.3:6667','10.156.0.4:6667','10.156.0.5:6667'}
 
 # Create Producer instance
 p = Producer(**conf)
@@ -41,20 +40,17 @@ p = Producer(**conf)
 # failed delivery (after retries).
 
 # Read lines from stdin, produce each line to Kafka
-for e in range(10):
+while True:
 	try:
 		# Produce line (without newline)
 		a = randint(1, 100)
-		line = str(a)
-		b = datetime.datetime.now()
-		x = '{"timestamp":"' + str(b)[:-3] + '", "message":"msg"}'
-		print(x)			
-		y = json.loads(x)
-		p.produce(topic, key = line, value = str(y))
+		line = str(a)			
+		y = json.dumps({'timestamp': str(datetime.datetime.now())[:-3], 'message': 'msg'})
+		p.produce(TOPIC,key=line,value=str(y))
 
 
 	except BufferError:
-		sys.stderr.write('%% Local producer queue is full (%d messages awaiting delivery): try 			again\n' % len(p))
+		print("Local producer queue is full ( " + str(len(p)) + " messages awaiting delivery): try again")
 
 # Serve delivery callback queue.
 # NOTE: Since produce() is an asynchronous API this poll() call
