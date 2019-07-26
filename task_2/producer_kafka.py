@@ -41,22 +41,22 @@ p = Producer(**conf)
 
 # Read lines from stdin, produce each line to Kafka
 while True:
-	try:
-		# Produce line (without newline)
-		a = randint(1, 100)
-		line = str(a)			
-		y = json.dumps({'timestamp': str(datetime.datetime.now())[:-3], 'message': 'msg'})
-		p.produce(TOPIC,key=line,value=str(y))
+    try:
+        # Produce line (without newline)
+        a = randint(1, 100)
+        line = str(a)			
+        y = json.dumps({'timestamp': str(datetime.datetime.now())[:-3], 'message': 'msg'})
+        p.produce(TOPIC,key=line,value=str(y))
 
 
-	except BufferError:
-		print("Local producer queue is full ( " + str(len(p)) + " messages awaiting delivery): try again")
+    except BufferError:
+        print("Local producer queue is full ( " + str(len(p)) + " messages awaiting delivery): try again")
 
-# Serve delivery callback queue.
-# NOTE: Since produce() is an asynchronous API this poll() call
-#       will most likely not serve the delivery callback for the
-#       last produce()d message.
-	p.poll(0)
+    # Serve delivery callback queue.
+    # NOTE: Since produce() is an asynchronous API this poll() call
+    #       will most likely not serve the delivery callback for the
+    #       last produce()d message.
+    p.poll(0)
 
 # Wait until all messages have been delivered
 p.flush()
