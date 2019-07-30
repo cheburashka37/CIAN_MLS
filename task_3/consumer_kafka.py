@@ -4,13 +4,19 @@ import json
 from pprint import pformat
 
 from confluent_kafka import Consumer, KafkaException
+from kafka import KafkaClient
 
-argv = sys.argv
-if len(argv) != 2:
-    print("enter number of consumers")
-    sys.exit(1)
+try:
+    client = KafkaClient(['10.156.0.3:6667', '10.156.0.4:6667', '10.156.0.5:6667'])
+    topic_partition_ids = client.get_partition_ids_for_topic('mles.announcements')
+    x = len(topic_partition_ids)
+    client.close()
+except Exception as ex:
+    print("client:: error:")
+    print(ex)
 
-x = int(argv[1])
+finally:
+    client.close()
 
 # Consumer configuration
 conf = {'bootstrap.servers': ['10.156.0.3:6667', '10.156.0.4:6667', '10.156.0.5:6667'], 'group.id': 'sschokorov'}
