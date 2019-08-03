@@ -41,4 +41,4 @@ rdd_row = rdd_json.map(lambda x: cur_dict(**x))
 df2 = spark.createDataFrame(rdd_row)
 #df2.collect()
 
-df2.write.format('orc').mode('overwrite').partitionBy('dadd').saveAsTable('sschokorov.test_pow')
+df2.write.format('orc').mode('overwrite').partitionBy('dadd').saveAsTable('sschokorov.announcement_parsed')
