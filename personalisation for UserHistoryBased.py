@@ -404,7 +404,7 @@ def personalisation(users, k):
 
     dist = distCos(t)
     sum_ = dist.sum() - dist.diagonal().sum()
-    sum_ = sum_/(k * k)
+    sum_ = sum_/(k * (k - 1))
     return sum_
 
 
